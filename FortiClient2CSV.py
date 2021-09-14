@@ -8,7 +8,7 @@ import sys
 
 def ReadSQLiteData(filename, tablename):
     
-    print("Reading SQLite Data from " + filename + "...")
+    print("Reading SQLite Data from " + filename)
 
     #Connect to Database    
     con = sql.connect(filename)
@@ -27,7 +27,7 @@ def ReadSQLiteData(filename, tablename):
 
 def ReadLastSQLiteLine(filename, tablename, columnname):
     
-    print("Reading Last Line of " + columnname + " from the " + tablename + " table using SQLite file " + filename + "...")
+    print("Reading Last Line of " + columnname + " from the " + tablename + " table using SQLite file " + filename)
 
     #Connect to Database    
     con = sql.connect(filename)
@@ -39,13 +39,13 @@ def ReadLastSQLiteLine(filename, tablename, columnname):
     cur = con.cursor()
 
     #Retreive Last Line from logfile from a given column of interest (See readme.md for db DESCRIBE)
-    cur.execute('SELECT * FROM %s ORDER BY %s DESC LIMIT 1;' % (tablename,columnname))
+    cur.execute(f'SELECT * FROM {tablename} ORDER BY {columnname} DESC LIMIT 1;')
     lastline = cur.fetchone()
 
     return lastline
 
 def FortiClientToCSV(db, filename):
-    print("Exporting client logs to " + filename + ".....")
+    print("Exporting client logs to " + filename)
     with open(filename, "w") as csv_file:
         csv_writer = csv.writer(csv_file)
         
@@ -63,7 +63,8 @@ def FortiClientToCSV(db, filename):
 try:    
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('filename', type=str, help="The fclog.dat filename to read from")
-    arg_parser.add_argument('--outfile', type=str, default=("FortiClient.csv"), help="Specifies a custom output filename (Default is YYYY-MM-DDTHH:MM:SS_Forticlient.csv from last log)")
+    arg_parser.add_argument('--outfile', type=str, default=("--"), help="Specifies a custom output filename (Default is YYYY-MM-DDTHH:MM:SS_Forticlient.csv from last log)")
+    arg_parser.add_argument('--outdir', type=str, default=os.getcwd(), help='Specifies a custom output directory')
 
     args = arg_parser.parse_args()
 
@@ -83,15 +84,15 @@ try:
                 print (ex)
                 sys.exit(2)
     try:
-        if args.outfile == "FortiClient.csv":            
+        if args.outfile == "--":            
             #Read in the last line of the log file, by date, to get the most recent log from FortiGate Logs
             lastline = ReadLastSQLiteLine(args.filename, 'LogTable', 'DateTime')
 
             #Convert the fetched row(Tuple) to a string to add to the filename
             lastdate = str(datetime.datetime.fromtimestamp(lastline['DateTime']).isoformat()) 
-            outfile = (lastdate + "_FortiClient.csv")
+            outfile = (args.outdir + lastdate + "_FortiClient.csv")
         else:
-            outfile = args.outfile
+            outfile = args.outdir + args.outfile
     
         #Create the CSV
         FortiClientToCSV(data,outfile)
