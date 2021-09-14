@@ -26,7 +26,7 @@ Extract the fclog.dat file from `%programfiles%\Fortinet\FortiClient\logs`
 
 run the script with `python3 ./FortiClient2CSV.py <fclog.dat location>`
 
-By default the file will name itself from from the last log entry in your fclog.dat file. However, you optionally specify an output location with `python3 ./FortiClient2CSV.py <fclog.dat location> --outfile <outfilename>`.
+By default the file will name itself from from the last log entry in your fclog.dat file. However, you optionally specify an output location with `python3 ./FortiClient2CSV.py <fclog.dat location> --outfile <outfilename>` or an output directory with 'python3 ./FortiClient2CSV.py <fclog.dat> --outdir <output directory>'
 
 ### fclog.dat schema
 
